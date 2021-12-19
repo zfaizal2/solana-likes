@@ -1,0 +1,90 @@
+{
+  "version": "0.1.0",
+  "name": "likes",
+  "instructions": [
+    {
+      "name": "createLikesAccount",
+      "accounts": [
+        {
+          "name": "likes",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "newLike",
+      "accounts": [
+        {
+          "name": "likes",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": [
+        {
+          "name": "txSignature",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Likes",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "insertAt",
+            "type": "u8"
+          },
+          {
+            "name": "transactions",
+            "type": {
+              "array": [
+                {
+                  "defined": "Transaction"
+                },
+                200
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "Transaction",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "signature",
+            "type": {
+              "array": [
+                "u8",
+                88
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "address": "Av2WRMKbkw1ircKXbxh9djiBUhJzasHEhXXHkcz3xVUw"
+  }
+}
