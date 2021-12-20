@@ -4,6 +4,7 @@ import {
   Program, Provider, web3
 } from '@project-serum/anchor'
 import idl from './../likes.json';
+import Transactions from './Transactions';
 
 const opts = {
   preflightCommitment: "processed"
@@ -13,10 +14,8 @@ const programID = new PublicKey(idl.metadata.address);
 const seed = "likes"
 export default function Likes() {
   const [walletAddress, setWalletAddress] = useState(null);
-  const [friendsWallet, setFriendsWallet] = useState("");
   const [likes, setLikes] = useState([])
   const [pubKey, setPubKey] = useState(null)
-  const [txns, setTxns] = useState([])
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -115,39 +114,7 @@ export default function Likes() {
       }
     return <div> connected </div>
   }
-  const getFriendsTxns = () => {
-    async function getTxns() {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                "jsonrpc": "2.0",
-                "id": 1,
-                "method": "getSignaturesForAddress",
-                "params": [
-                    friendsWallet,
-                    {
-                        "limit": 100
-                    }
-                ]
-            })
-        }
-        // setTxns("loading...")
-        fetch("https://api.devnet.solana.com", requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data)
-                setTxns(data.result)
-            })
-    }
-    getTxns();
-  }
 
-  const onInputChange = (event) => {
-    const { value } = event.target;
-    console.log(value)
-    setFriendsWallet(value);
-  };
 
   useEffect(() => {
     window.addEventListener('load', async (event) => {
@@ -162,12 +129,7 @@ export default function Likes() {
       <div>
           {!walletAddress && renderNotConnectedContainer()}
           {walletAddress && renderConnectedContainer()}
-          <input type="text" onChange={onInputChange}/>
-          <button onClick={getFriendsTxns}>submit</button>
-          {console.log(txns.length)}
-          {txns.length != "loading..." && txns.map(item => (
-              <div>{(item.toString())}</div>
-          ))}
+          <Transactions></Transactions>
       </div>
   );
 }
