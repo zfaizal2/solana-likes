@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Connection, PublicKey, clusterApiUrl} from '@solana/web3.js'
+import { SystemProgram, Connection, PublicKey, clusterApiUrl} from '@solana/web3.js'
 import {
   Program, Provider, web3
 } from '@project-serum/anchor'
 import idl from './../likes.json';
 import Transactions from './Transactions';
+
+// const {SystemProgram} = web3;
 
 const opts = {
   preflightCommitment: "processed"
@@ -16,7 +18,7 @@ export default function Likes() {
   const [walletAddress, setWalletAddress] = useState(null);
   const [likes, setLikes] = useState([])
   const [pubKey, setPubKey] = useState(null)
-
+  const [payer, setPayer] = useState()
   const checkIfWalletIsConnected = async () => {
     try {
       const { solana } = window;
@@ -61,6 +63,8 @@ export default function Likes() {
     const provider = new Provider(
       connection, window.solana, opts.preflightCommitment,
     );
+    console.log(provider.wallet)
+    setPayer(provider.wallet.payer);
     return provider;
   }
 
@@ -76,16 +80,31 @@ export default function Likes() {
 
   const createLikesAccount = async() => {
     try {
-        const provider = getProvider();
+        const provider = await getProvider();
         const program = new Program(idl, programID, provider);
+        const likes = await PublicKey.createWithSeed(provider.wallet.publicKey, seed, programID)
+
         await program.rpc.createLikesAccount({
         accounts: {
-            likes: pubKey, 
+            likes: likes, 
             user: provider.wallet.publicKey,
         },
+        instructions: [
+          SystemProgram.createAccountWithSeed({
+            basePubkey: provider.wallet.publicKey,
+            fromPubkey: provider.wallet.publicKey,
+            lamports:
+              await provider.connection.getMinimumBalanceForRentExemption(
+                program.account.likes.size
+              ),
+            newAccountPubkey: likes,
+            programId: program.programId,
+            seed: seed,
+            space: program.account.likes.size,
+          }),
+        ],
         });
-        console.log("Created a new BaseAccount w/ address:", provider.wallet.toString())
-        // await getGifList();
+        console.log("Created a new BaseAccount w/ address:", provider.wallet.publicKey._bn.words)
     } catch(error) {
         console.log("Error creating BaseAccount account:", error)
     }     

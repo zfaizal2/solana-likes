@@ -57,6 +57,10 @@ export default function Transactions() {
         setFriendsWallet(value);
       };
 
+      const sendLike = () => {
+          
+      }
+
     return (
     <div>
         <input type="text" onChange={onInputChange}/>
