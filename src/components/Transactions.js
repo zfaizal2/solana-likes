@@ -1,9 +1,21 @@
 import React, {useState} from 'react'
 import { SOLSCAN_BASE_URL, DEVNET_EXPLORER_BASE_URL } from '../consts';
-
-export default function Transactions() {
+import { SystemProgram, Connection, PublicKey, clusterApiUrl} from '@solana/web3.js'
+import {
+  Program, Provider
+} from '@project-serum/anchor'
+import idl from './../likes.json';
+const opts = {
+    preflightCommitment: "processed"
+  }
+const network = clusterApiUrl('devnet');
+const programID = new PublicKey(idl.metadata.address);
+const seed = "likes"
+window.Buffer = window.Buffer || require('buffer').Buffer;
+export default function Transactions(props) {
     const [friendsWallet, setFriendsWallet] = useState("");
     const [txns, setTxns] = useState([])
+    const walletAddress = props.walletAddress;
 
 
     const getFriendsTxns = () => {
@@ -57,8 +69,56 @@ export default function Transactions() {
         setFriendsWallet(value);
       };
 
-      const sendLike = () => {
-          
+      const getProvider = () => {
+        const connection = new Connection(network, opts.preflightCommitment);
+        const provider = new Provider(
+          connection, window.solana, opts.preflightCommitment,
+        );
+
+        return provider;
+      }
+
+      const sendLike = txn => async() => {
+        try {
+            const provider = await getProvider();
+            const program = new Program(idl, programID, provider);
+            const connection = new Connection(network, opts.preflightCommitment);
+
+            const like = await PublicKey.createWithSeed(provider.wallet.publicKey, seed, programID)
+            // console.log(likes)
+            var txnR = await connection.getAccountInfo(like);
+            const likes = txnR;
+            await program.rpc.newLike(
+                txn,
+                {
+                accounts: {
+                    likes: like,
+                    user: provider.wallet.publicKey,
+                },
+                instructions: [
+                    program.instruction.newLike(
+                        txn,
+                        {
+                            accounts: {
+                                likes: like,
+                                user: provider.wallet.publicKey,
+                            },
+                        }
+                    ),
+                ],
+            })
+            console.log("liked")
+        } catch (error) {
+            console.log(error)
+        }
+      }
+
+      const acctExists = async() => {
+        const provider = await getProvider();
+        const connection = new Connection(network, opts.preflightCommitment);
+        const likes = await PublicKey.createWithSeed(provider.wallet.publicKey, seed, programID)
+        var txn = await connection.getAccountInfo(likes);
+          console.log(txn.data)
       }
 
     return (
@@ -67,9 +127,12 @@ export default function Transactions() {
         <button onClick={getSolscanTxn}>submit</button>
         {console.log(txns.length)}
         {txns != "loading..." && txns.map(item => (
-            <div>
+            <div >
                 <div>{item.txHash.toString().substring(0,10)}...</div>
                 <div>{(item.parsedInstruction[0].type.toString())}</div>
+                <button onClick={sendLike(item.txHash.toString())}>like!</button>
+                <button onClick={acctExists}>get likes</button>
+
             </div>
         ))}
     </div>

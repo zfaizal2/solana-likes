@@ -148,7 +148,7 @@ export default function Likes() {
       <div>
           {!walletAddress && renderNotConnectedContainer()}
           {walletAddress && renderConnectedContainer()}
-          <Transactions></Transactions>
+          <Transactions walletAddress={walletAddress}></Transactions>
       </div>
   );
 }
