@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SystemProgram, Connection, PublicKey, clusterApiUrl} from '@solana/web3.js'
 import {
-  Program, Provider, web3
+  Program, Provider, setProvider, web3
 } from '@project-serum/anchor'
 import idl from './../likes.json';
 import Transactions from './Transactions';
@@ -14,11 +14,11 @@ const opts = {
 const network = clusterApiUrl('devnet');
 const programID = new PublicKey(idl.metadata.address);
 const seed = "likes"
-export default function Likes() {
-  const [walletAddress, setWalletAddress] = useState(null);
+export default function Likes(props) {
   const [likes, setLikes] = useState([])
   const [pubKey, setPubKey] = useState(null)
   const [payer, setPayer] = useState()
+  const walletAddress = props.walletAddress;
   const checkIfWalletIsConnected = async () => {
     try {
       const { solana } = window;
@@ -36,9 +36,7 @@ export default function Likes() {
             response.publicKey.toString()
           );
           const pubKey = await PublicKey.createWithSeed(response.publicKey, seed, programID)
-          setPubKey(pubKey)
-          setWalletAddress(response.publicKey.toString());
-          getLikes();
+
         }
       } else {
         alert('Solana object not found! Get a Phantom Wallet 👻');
@@ -48,15 +46,7 @@ export default function Likes() {
     }
   };
 
-  const connectWallet = async () => {
-    const { solana } = window;
 
-    if (solana) {
-      const response = await solana.connect();
-      console.log('Connected with Public Key:', response.publicKey.toString());
-      setWalletAddress(response.publicKey.toString());
-    }
-  };
 
   const getProvider = () => {
     const connection = new Connection(network, opts.preflightCommitment);
@@ -67,13 +57,19 @@ export default function Likes() {
     setPayer(provider.wallet.payer);
     return provider;
   }
-
+//deserialize unbuffer likes 
   const getLikes = async() => {
       try {
           const provider = getProvider();
           const program = new Program(idl, programID, provider);
-          const account = await program.account.likes.fetch(walletAddress.publicKey)
-      } catch {
+          const likesKey = await PublicKey.createWithSeed(provider.wallet.publicKey, seed, programID)
+          const acct = await provider.connection.getAccountInfo(likesKey)
+          const likes = acct.data;
+          setLikes(likes)
+
+          console.log(acct)
+        } catch (error){
+          console.log(error)
           setLikes(null)
       }
   }
@@ -104,35 +100,19 @@ export default function Likes() {
           }),
         ],
         });
+        setLikes(likes)
         console.log("Created a new BaseAccount w/ address:", provider.wallet.publicKey._bn.words)
     } catch(error) {
         console.log("Error creating BaseAccount account:", error)
     }     
   }
 
-
-  const renderNotConnectedContainer = () => (
-    <button
-      className="cta-button connect-wallet-button"
-      onClick={connectWallet}
-    >
-      Connect to Wallet
-    </button>
-  );
-
-  const renderConnectedContainer = () => {
-      console.log(likes)
-      if (likes === null) {
-        return ( 
-        <div>nada
-            <button onClick={createLikesAccount}>create likes account to start</button>
-        </div>
-        )
-      } else {
-          return <div>we got him boys</div>
-      }
-    return <div> connected </div>
-  }
+  useEffect(() => { 
+    async function accountExists() {
+      await getLikes()
+    }
+    accountExists()
+  }, [walletAddress]);
 
 
   useEffect(() => {
@@ -140,15 +120,21 @@ export default function Likes() {
       await checkIfWalletIsConnected();
     });
   }, []);
+            // setTxns("loading...")
 
-
+      
 
 
   return (
+    
       <div>
-          {!walletAddress && renderNotConnectedContainer()}
-          {walletAddress && renderConnectedContainer()}
-          <Transactions walletAddress={walletAddress}></Transactions>
+          {console.log(walletAddress)}
+          
+          {likes ?
+            <Transactions walletAddress={walletAddress}></Transactions>
+            :
+            <button onClick={createLikesAccount}>plz create account </button>
+          }
       </div>
   );
 }

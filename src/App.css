@@ -1,10 +1,22 @@
 .App {
   text-align: center;
+  height: auto;
+  
+}
+
+html {
+  background: #101921;
 }
 
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+}
+
+.App-header-text {
+  margin-left: 20px;
+  margin-right: auto;
+  display: flex;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -14,14 +26,19 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  /* background-color: #282c34; */
   min-height: 10vh;
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+}
+
+.connect-wallet {
+  display: inline-flex;
+  margin-right: 20px;
 }
 
 .App-link {
