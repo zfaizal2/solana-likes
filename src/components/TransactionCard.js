@@ -1,11 +1,11 @@
-import React, {useState} from 'react'
-import { SystemProgram, Connection, PublicKey, clusterApiUrl} from '@solana/web3.js'
+import React from 'react'
+import { Connection, PublicKey, clusterApiUrl} from '@solana/web3.js'
 import {
   Program, Provider
 } from '@project-serum/anchor'
 import idl from './../likes.json';
 import  "./../styles/TransactionCard.css"
-import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
+import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 const opts = {
     preflightCommitment: "processed"
   }
@@ -16,6 +16,8 @@ const seed = "likes"
 
 export default function TransactionCard(props) {
     const txnData = props.item;
+    const likes = props.likes;
+
     const getProvider = () => {
         const connection = new Connection(network, opts.preflightCommitment);
         const provider = new Provider(
@@ -29,12 +31,10 @@ export default function TransactionCard(props) {
         try {
             const provider = await getProvider();
             const program = new Program(idl, programID, provider);
-            const connection = new Connection(network, opts.preflightCommitment);
+            // const connection = new Connection(network, opts.preflightCommitment);
 
             const like = await PublicKey.createWithSeed(provider.wallet.publicKey, seed, programID)
-            // console.log(likes)
-            var txnR = await connection.getAccountInfo(like);
-            const likes = txnR;
+
             await program.rpc.newLike(
                 txn,
                 {
@@ -67,7 +67,11 @@ export default function TransactionCard(props) {
         </div>
         <div className="instruction">{(txnData.parsedInstruction[0].type.toString())}</div>
         <div className='like'> 
-            <AiOutlineHeart onClick={sendLike(txnData.txHash.toString())}/>
+            {console.log(likes, txnData.txHash.toString())}
+            {likes.includes(txnData.txHash.toString()) ?
+                <AiFillHeart/> :
+                <AiOutlineHeart onClick={sendLike(txnData.txHash.toString())}/>
+            }
         </div>    
     </div>
     
