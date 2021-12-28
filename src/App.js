@@ -25,11 +25,16 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <div className='App-header-text'>likes.</div>
+        <div className='App-header-text'>likes. <div style={{fontSize:".7rem"}}> devnet</div></div>
         <div className='connect-wallet'>
           {!walletAddress && renderNotConnectedContainer()}
         </div>
       </header>
+      <div className="App-notice">
+        <div>transaction data is from mainnet powered by solscan</div>
+        <div>and transaction likes are executed on devnet.</div>
+        <div>so... sorry or you're welcome.</div>
+      </div>
       { walletAddress ?
         <Likes walletAddress={walletAddress}/>
         :

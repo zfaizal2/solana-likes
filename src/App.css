@@ -5,7 +5,7 @@
 }
 
 html {
-  background: #101921;
+  background-color: rgba(84, 72, 200, 0.8);
 }
 
 .App-logo {
@@ -17,6 +17,7 @@ html {
   margin-left: 20px;
   margin-right: auto;
   display: flex;
+  background-color: rgba(0, 0, 34, .6);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -45,6 +46,15 @@ html {
   color: #61dafb;
 }
 
+.App-notice {
+  background-color: rgba(0,0,0,.3);
+  width: fit-content;
+  padding: 1rem;
+  margin:auto;
+  margin-bottom: 1rem;
+  color: white;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -52,4 +62,15 @@ html {
   to {
     transform: rotate(360deg);
   }
+}
+
+button {
+  background-color:rgba(0, 0, 34, .85);
+  color: white;
+  font-weight: bold;
+  border-radius: 10px;
+  border:0;
+  padding: .6rem;
+  margin: 0.2rem;
+  font-size: 1rem;
 }

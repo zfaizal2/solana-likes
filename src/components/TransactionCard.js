@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Connection, PublicKey, clusterApiUrl} from '@solana/web3.js'
 import {
   Program, Provider
@@ -17,6 +17,7 @@ const seed = "likes"
 export default function TransactionCard(props) {
     const txnData = props.item;
     const likes = props.likes;
+    const [liked, setLiked] = useState(false)
 
     const getProvider = () => {
         const connection = new Connection(network, opts.preflightCommitment);
@@ -54,7 +55,9 @@ export default function TransactionCard(props) {
                     ),
                 ],
             })
-            console.log("liked")
+            window.alert("txn liked!")
+            likes.push(txn)
+            setLiked(true)
         } catch (error) {
             console.log(error)
         }
@@ -63,12 +66,11 @@ export default function TransactionCard(props) {
     return (
     <div className='card'>
         <div>
-            <a href={`https://solscan.io/tx/${txnData.txHash.toString()}`} target={"_blank"}>{txnData.txHash.toString().substring(0,10)}...</a>
+            <a href={`https://solscan.io/tx/${txnData.txHash.toString()}`} target={"_blank"}>{txnData.txHash.toString().substring(0,15)}...</a>
         </div>
         <div className="instruction">{(txnData.parsedInstruction[0].type.toString())}</div>
         <div className='like'> 
-            {console.log(likes, txnData.txHash.toString())}
-            {likes.includes(txnData.txHash.toString()) ?
+            {likes.includes(txnData.txHash.toString()) || liked ?
                 <AiFillHeart/> :
                 <AiOutlineHeart onClick={sendLike(txnData.txHash.toString())}/>
             }

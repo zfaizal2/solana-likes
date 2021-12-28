@@ -1,11 +1,11 @@
 .card {
     width: 60%;
     /* border-width: 10px; */
-    border: 2px solid #000;
-    border-radius: 15px;
+    /* border: 2px solid #000; */
+    border-radius: 25px;
     margin: auto;
     margin-bottom: 1rem;
-    padding: 1rem;
+    padding: 2rem;
     display: flex;
     background-color: white;
 }
@@ -13,9 +13,11 @@
 .like {
     display: flex;
     margin-left: auto;
+    font-size:x-large;
 }
 
 .instruction {
     margin-left: auto;
     margin-right: auto;
 }
+
