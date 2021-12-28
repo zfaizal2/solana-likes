@@ -147,7 +147,7 @@ export default function Likes(props) {
       <div>
           {likes ?
             <div>
-              <button onClick={toggleMyLikes}>{myLikes ? "find txns" : "my likes"}</button>
+              <button style={{marginBottom:"1rem"}} onClick={toggleMyLikes}>{myLikes ? "find txns" : "my likes"}</button>
               {myLikes && likes.length > 0 ?
                 <>{renderLikes()}</>
                 :
